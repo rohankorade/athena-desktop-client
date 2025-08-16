@@ -1,0 +1,59 @@
+/* Basic Reset and Body Styles */
+body {
+    font-family: 'Inter', sans-serif;
+    background-color: #f0f2f5;
+    color: #1c1e21;
+    margin: 0;
+    padding: 20px;
+}
+
+/* Header Styles */
+.dashboard-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #ffffff;
+    padding: 15px 30px;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.welcome-container h2 {
+    font-size: 1.5rem; /* 24px */
+    font-weight: 500;
+    color: #333;
+    margin: 0;
+}
+
+/* Timers Styles */
+.timers-wrapper {
+    display: flex;
+    gap: 20px;
+}
+
+.timer-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background-color: #f7f7f7;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 10px 20px;
+    min-width: 150px;
+    text-align: center;
+}
+
+.timer-exam-name {
+    font-size: 0.875rem; /* 14px */
+    font-weight: 500;
+    color: #606770;
+    margin-bottom: 5px;
+}
+
+.timer-days {
+    font-size: 2.25rem; /* 36px */
+    font-weight: 700;
+    color: #1d2129;
+    line-height: 1.1;
+}
