@@ -1,21 +1,45 @@
 document.addEventListener('DOMContentLoaded', () => {
     displayWelcomeMessage();
     displayExamTimers();
+    displayPerformanceData();
 });
 
+/**
+ * Displays the current date and a time-sensitive welcome message.
+ */
 function displayWelcomeMessage() {
-    const welcomeElement = document.getElementById('welcome-message');
-    const currentHour = new Date().getHours();
+    const dateElement = document.getElementById('current-date');
+    const dividerElement = document.querySelector('#welcome-message .divider');
+    const greetingElement = document.getElementById('greeting');
+    
+    const now = new Date();
 
+    // 1. Get each part of the date individually
+    const weekday = now.toLocaleDateString('en-GB', { weekday: 'long' });
+    const day = now.getDate();
+    const month = now.toLocaleDateString('en-GB', { month: 'long' });
+    const year = now.getFullYear();
+
+    // 2. Build the final string with the comma exactly where we want it
+    const formattedDate = `${weekday}, ${day} ${month} ${year}`;
+    
+    // 3. Set the text content
+    dateElement.textContent = formattedDate;
+
+    // 4. Set the divider
+    dividerElement.textContent = '|';
+
+    // 5. Determine and set the greeting
+    const currentHour = now.getHours();
     let greeting;
     if (currentHour < 12) {
-        greeting = 'Good morning';
+        greeting = 'Good Morning';
     } else if (currentHour < 18) {
-        greeting = 'Good afternoon';
+        greeting = 'Good Afternoon';
     } else {
-        greeting = 'Good evening';
+        greeting = 'Good Evening';
     }
-    welcomeElement.textContent = `${greeting}.`;
+    greetingElement.textContent = greeting;
 }
 
 async function displayExamTimers() {
@@ -97,4 +121,81 @@ function createExamBlock(exam, isUpcoming = false) {
     examBlock.appendChild(daysElement);
 
     return examBlock;
+}
+
+// Displays the performance data in a chart and a list of scores.
+// This function fetches the data from the API and populates the UI accordingly.
+async function displayPerformanceData() {
+    const scoresContainer = document.getElementById('scores-list-container');
+    const chartCanvas = document.getElementById('performance-chart');
+
+    // In a real app, you would get this ID dynamically (e.g., from a dropdown)
+    // For now, we'll use the one you provided.
+    const seriesId = 'eSZtHFBepNOZaOABQx7I';
+    const apiUrl = `https://kenshin.pythonanywhere.com/api/v1/mocks/${seriesId}/tests`;
+
+    try {
+        const response = await fetch(apiUrl);
+        if (!response.ok) throw new Error(`HTTP Error: ${response.status}`);
+        const tests = await response.json();
+
+        // 1. Populate the list of scores on the left
+        scoresContainer.innerHTML = ''; // Clear placeholder
+        [...tests].reverse().forEach(test => {
+            const scoreBlock = document.createElement('div');
+            scoreBlock.className = 'score-block';
+            scoreBlock.innerHTML = `
+                <span class="score-block-name">${test.subject} (Test #${test['test-number']})</span>
+                <span class="score-block-value">${test.score}</span>
+            `;
+            scoresContainer.appendChild(scoreBlock);
+        });
+
+        // 2. Prepare data and draw the chart on the right
+        const labels = tests.map(test => new Date(test.date).toLocaleDateString('en-GB', {day:'numeric', month:'short'}));
+        const scores = tests.map(test => test.score);
+
+        new Chart(chartCanvas, {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Mock Score',
+                    data: scores,
+                    borderColor: '#4267B2', // A nice blue color
+                    backgroundColor: 'rgba(66, 103, 178, 0.1)',
+                    fill: true,
+                    tension: 0.3, // Makes the line curve smoothly
+                    pointBackgroundColor: '#4267B2',
+                    pointRadius: 4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false // Hides the legend label to keep it clean
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: false, // Y-axis doesn't have to start at 0
+                        ticks: {
+                            padding: 10
+                        }
+                    },
+                    x: {
+                        ticks: {
+                            padding: 10
+                        }
+                    }
+                }
+            }
+        });
+
+    } catch (error) {
+        scoresContainer.innerHTML = `<p style="color: red;">Could not load performance data.</p>`;
+        console.error("Error fetching performance data:", error);
+    }
 }

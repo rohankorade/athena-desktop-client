@@ -8,20 +8,31 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
 
     <div class="welcome-container">
-        <h2 id="welcome-message">Loading...</h2>
+        <h2 id="welcome-message">
+            <span id="current-date"></span>
+            <span class="divider"></span>
+            <span id="greeting"></span>
+        </h2>
     </div>
 
     <main class="dashboard-card">
-        <h3 class="card-title">Days Remaining</h3>
+        <h3 class="card-title">Countdown</h3>
         <div class="timers-grid">
-            <div id="upcoming-exam-container" class="upcoming-column">
-                </div>
-            <div id="other-exams-container" class="other-exams-column">
-                </div>
+            <div id="upcoming-exam-container" class="upcoming-column"></div>
+            <div id="other-exams-container" class="other-exams-column"></div>
+        </div>
+    </main>
+
+    <main class="dashboard-card">
+        <h3 class="card-title">Performance</h3>
+        <div class="performance-grid">
+            <div id="scores-list-container" class="scores-list-column"></div>
+            <div class="graph-column"><canvas id="performance-chart"></canvas></div>
         </div>
     </main>
 

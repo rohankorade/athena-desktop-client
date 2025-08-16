@@ -13,23 +13,31 @@ body {
 }
 
 .welcome-container h2 {
-    font-size: 1.75rem; /* 28px */
-    font-weight: 500;
+    font-size: 1.1rem; /* 28px */
+    font-weight: 400;
     color: #333;
     margin: 0;
+}
+#current-date {
+    font-weight: 700; /* or 'bold' */
+}
+#welcome-message .divider {
+    color: #a0c4ff; /* Bluish accent color */
+    margin: 0 12px; /* Adds space on either side */
+    font-weight: 300; /* Makes the divider a bit thinner */
 }
 
 /* Main Dashboard Card */
 .dashboard-card {
     background-color: #ffffff;
-    padding: 24px;
+    padding: 10px;
     border-radius: 12px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
 }
 
 .card-title {
-    margin: 0 0 20px 0;
-    font-size: 1.125rem; /* 18px */
+    margin: 0 0 10px 0; /* Margin below the title */
+    font-size: 1rem; /* 18px */
     font-weight: 700;
     color: #606770;
     text-transform: uppercase;
@@ -49,11 +57,11 @@ body {
 }
 
 .other-exams-column {
-    flex: 1; /* Take up the remaining space */
+    flex: 1;
     display: flex;
-    flex-wrap: wrap; /* This prevents overflow */
+    flex-wrap: wrap;
     gap: 16px;
-    align-content: flex-start; /* Aligns items to the top */
+    align-content: center; /* Center the content vertically */
 }
 
 /* Universal Style for each Exam Block */
@@ -87,17 +95,100 @@ body {
     line-height: 1.1;
 }
 
-/* Modifier for the big upcoming exam block */
+/* Modifier for the upcoming exam block */
 .exam-block--upcoming .exam-name {
-    font-size: 1.25rem; /* 20px */
+    font-size: 1rem; /* 17.6px - Was 1.25rem */
+    margin: 5px; /* Reduced margin for better spacing */
+    font-weight: 600; /* Slightly bolder for emphasis */
 }
 
 .exam-block--upcoming .exam-days {
-    font-size: 4.5rem; /* 72px */
+    font-size: 3.5rem;  /* 32px instead of 56px */
+    line-height: 0.5;   /* tighten vertical spacing */
+    margin: 20px; /* Remove margin for better alignment */
 }
+
 
 /* Style for the smaller blocks in the right column */
 .other-exams-column .exam-block {
-    width: calc(50% - 8px); /* Two blocks per row, accounting for gap */
-    min-width: 180px; /* Minimum width before wrapping */
+    width: 300px; /* Fixed width for consistency */
+    display: flex;
+    flex-direction: row; /* Arrange items horizontally */
+    align-items: stretch; /* Make children fill the block height */
+    padding: 0; /* Remove padding from the container */
+}
+
+/* The name part is now the left division */
+.other-exams-column .exam-name {
+    flex: 1; /* Allow name to take available space */
+    padding: 16px;
+    font-size: 0.9rem; /* 14.4px */
+    border-right: 2px solid #dde7f5; /* Bluish vertical divider */
+    margin: 0;
+    display: flex; /* Center the text horizontally */
+    align-items: center; /* Center the text vertically */
+}
+
+/* The horizontal divider is not needed in this layout */
+.other-exams-column .exam-divider {
+    display: none;
+}
+
+/* The days part is now the right division */
+.other-exams-column .exam-days {
+    padding: 16px;
+    font-size: 1.75rem; /* 28px */
+    min-width: 60px;
+    text-align: center;
+    margin: 0;
+    display: flex;
+    align-items: center; /* Center the number vertically */
+    justify-content: center;
+}
+
+/* Add space between dashboard cards */
+.dashboard-card + .dashboard-card {
+    margin-top: 12px;
+}
+
+/* Performance Card Layout */
+.performance-grid {
+    display: flex;
+    gap: 24px;
+    height: 260px;  /* <-- SET the fixed height on the parent grid */
+}
+
+.scores-list-column {
+    flex: 0 0 30%;      /* Changed from 40% to 30% for the new proportion */
+    overflow-y: auto;   /* This makes the list scrollable if it exceeds the height */
+    padding-right: 16px;
+    /* We remove max-height so it's controlled by the graph's height */
+}
+
+.graph-column {
+    flex: 1;
+}
+
+/* Individual Score Block Style */
+.score-block {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px;
+    background-color: #f9f9f9;
+    border-radius: 6px;
+    border: 1px solid #eee;
+    margin-bottom: 8px;
+}
+
+.score-block-name {
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: #333;
+}
+
+.score-block-value {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #1d2129;
 }
