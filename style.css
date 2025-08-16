@@ -4,56 +4,100 @@ body {
     background-color: #f0f2f5;
     color: #1c1e21;
     margin: 0;
-    padding: 20px;
+    padding: 24px;
 }
 
-/* Header Styles */
-.dashboard-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    background-color: #ffffff;
-    padding: 15px 30px;
-    border-radius: 12px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+/* Standalone Welcome Message */
+.welcome-container {
+    margin-bottom: 24px;
 }
 
 .welcome-container h2 {
-    font-size: 1.5rem; /* 24px */
+    font-size: 1.75rem; /* 28px */
     font-weight: 500;
     color: #333;
     margin: 0;
 }
 
-/* Timers Styles */
-.timers-wrapper {
-    display: flex;
-    gap: 20px;
+/* Main Dashboard Card */
+.dashboard-card {
+    background-color: #ffffff;
+    padding: 24px;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
 }
 
-.timer-card {
+.card-title {
+    margin: 0 0 20px 0;
+    font-size: 1.125rem; /* 18px */
+    font-weight: 700;
+    color: #606770;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* Two-column Grid Layout */
+.timers-grid {
     display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
+    gap: 24px;
+}
+
+.upcoming-column {
+    flex: 0 0 30%; /* 30% width, don't grow or shrink */
+    border-right: 2px solid #dde7f5; /* Bluish accent divider */
+    padding-right: 24px;
+}
+
+.other-exams-column {
+    flex: 1; /* Take up the remaining space */
+    display: flex;
+    flex-wrap: wrap; /* This prevents overflow */
+    gap: 16px;
+    align-content: flex-start; /* Aligns items to the top */
+}
+
+/* Universal Style for each Exam Block */
+.exam-block {
     background-color: #f7f7f7;
     border: 1px solid #e0e0e0;
     border-radius: 8px;
-    padding: 10px 20px;
-    min-width: 150px;
-    text-align: center;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    width: 100%; /* Default width for the upcoming block */
 }
 
-.timer-exam-name {
-    font-size: 0.875rem; /* 14px */
+.exam-name {
+    font-size: 1rem; /* 16px */
     font-weight: 500;
-    color: #606770;
-    margin-bottom: 5px;
+    color: #333;
 }
 
-.timer-days {
-    font-size: 2.25rem; /* 36px */
+.exam-divider {
+    border: none;
+    height: 2px;
+    background-color: #a0c4ff; /* Bluish accent */
+    margin: 12px 0;
+}
+
+.exam-days {
+    font-size: 2.5rem; /* 40px */
     font-weight: 700;
     color: #1d2129;
     line-height: 1.1;
+}
+
+/* Modifier for the big upcoming exam block */
+.exam-block--upcoming .exam-name {
+    font-size: 1.25rem; /* 20px */
+}
+
+.exam-block--upcoming .exam-days {
+    font-size: 4.5rem; /* 72px */
+}
+
+/* Style for the smaller blocks in the right column */
+.other-exams-column .exam-block {
+    width: calc(50% - 8px); /* Two blocks per row, accounting for gap */
+    min-width: 180px; /* Minimum width before wrapping */
 }
