@@ -25,7 +25,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     // These functions will only run if their HTML elements exist on the current page
     displayExamTimers(futureExams); 
     displayPerformanceData();
-    initializeFileExplorer(); // This will only run on the editorials page
+    initializeFileExplorer(futureExams); // This will only run on the editorials page
 });
 
 /**
@@ -312,7 +312,7 @@ function displayExamTimers(futureExams) {
 /**
  * Initializes the entire file explorer functionality for the editorials page.
  */
-async function initializeFileExplorer() {
+async function initializeFileExplorer(futureExams) {
     const explorerContainer = document.getElementById('file-explorer');
     if (!explorerContainer) return; // Only run on the editorials page
 
@@ -323,12 +323,14 @@ async function initializeFileExplorer() {
     list.innerHTML = '<li class="loading-message">Loading Editorials...</li>';
 
     let editorialsByDate = {}; // This will hold our organized data
+    let allEditorials = [];
     let currentState = { level: 'years', year: null, month: null };
 
     // 1. Fetch and process the data into a nested structure
     async function fetchData() {
         const response = await fetch('https://kenshin.pythonanywhere.com/api/v1/notes/editorials');
         const editorials = await response.json();
+        allEditorials = editorials;
 
         // Group editorials by year, then month, then day
         editorials.forEach(e => {
@@ -353,6 +355,7 @@ async function initializeFileExplorer() {
         // Render the correct level
         if (currentState.level === 'years') {
 			breadcrumb.innerHTML = `<span class="crumb-active">🏠 Editorials</span>`;
+            renderHomeStats(futureExams, allEditorials);
             Object.keys(editorialsByDate).sort((a, b) => b - a).forEach(year => { // Sort years descending
                 const item = document.createElement('li');
                 item.className = 'explorer-item';
@@ -429,6 +432,7 @@ async function initializeFileExplorer() {
 		
 			if (level === 'years') {
 				currentState = { level: 'years', year: null, month: null };
+                renderHomeStats(futureExams, allEditorials);
 			} else if (level === 'months') {
 				currentState.level = 'months';
 				currentState.month = null;
@@ -436,7 +440,6 @@ async function initializeFileExplorer() {
 			
 			// After changing state, re-render the explorer list and clear the content area
 			render();
-			document.getElementById('content-area').innerHTML = '<p>Content Area</p>';
 		});
 
     // Initial setup
@@ -477,6 +480,51 @@ async function initializeFileExplorer() {
             contentArea.appendChild(item);
         });
     }
+
+    	// ADD THIS NEW FUNCTION inside initializeFileExplorer
+	function renderHomeStats(futureExams, allEditorials) {
+		const contentArea = document.getElementById('content-area');
+		contentArea.innerHTML = ''; // Clear previous content
+	
+		// 1. Calculate Total Days
+		const prelimsExam = futureExams.find(e => e.id === 'pWySIJBI4yDC6v2YzLlD');
+		const totalDaysAvailable = prelimsExam ? prelimsExam.daysRemaining : 0;
+	
+		// 2. Calculate Editorial Counts
+		const totalEditorials = allEditorials.length;
+		const unreadCount = allEditorials.filter(e => !e.is_read).length;
+		const readCount = totalEditorials - unreadCount;
+	
+		// 3. Calculate Per Day Metric
+		const perDayMetric = totalDaysAvailable > 0 ? (unreadCount / totalDaysAvailable).toFixed(1) : 0;
+	
+		// 4. Create the HTML and render it
+		const statsHTML = `
+			<div class="stats-grid">
+				<div class="stat-card">
+					<p class="stat-value">${totalDaysAvailable}</p>
+					<p class="stat-label">Days to CSP</p>
+				</div>
+				<div class="stat-card">
+					<p class="stat-value">${totalEditorials}</p>
+					<p class="stat-label">Total Editorials</p>
+				</div>
+				<div class="stat-card">
+					<p class="stat-value" style="color: #42b72a;">${readCount}</p>
+					<p class="stat-label">Read</p>
+				</div>
+				<div class="stat-card">
+					<p class="stat-value" style="color: #f02849;">${unreadCount}</p>
+					<p class="stat-label">Unread</p>
+				</div>
+				<div class="stat-card">
+					<p class="stat-value">${perDayMetric}</p>
+					<p class="stat-label">Per Day Metric</p>
+				</div>
+			</div>
+		`;
+		contentArea.innerHTML = statsHTML;
+	}
 
 	const contentArea = document.getElementById('content-area');
 	const modal = document.getElementById('editorial-modal');
@@ -533,26 +581,36 @@ async function initializeFileExplorer() {
 	
 		// --- TOGGLE READ/UNREAD BUTTON LOGIC ---
 		if (target.classList.contains('btn-toggle-read')) {
-			const athenaId = target.dataset.athenaId;
 			const docId = target.dataset.docId;
-			const item = editorialsByDate[currentState.year][currentState.month][target.closest('.editorial-item').querySelector('.btn-view').dataset.day].find(e => e.id === docId);
-	
-			if (!item) return;
-	
-			const newStatus = !item.is_read;
-	
+			const athenaId = target.dataset.athenaId;
+		
+			// First, find the currently selected day in the explorer list
+			const selectedDayElement = document.querySelector('#explorer-list .explorer-item.selected');
+			if (!selectedDayElement) return; // Exit if no day is selected
+		
+			const day = selectedDayElement.dataset.day;
+			
+			// Now, find the specific editorial in our data using the IDs
+			const editorialsForDay = editorialsByDate[currentState.year][currentState.month][day];
+			if (!editorialsForDay) return;
+			const itemToUpdate = editorialsForDay.find(e => e.id === docId);
+			if (!itemToUpdate) return;
+		
+			// Proceed with the update
+			const newStatus = !itemToUpdate.is_read;
+		
 			// API call to update the status in the database
-			await fetch(`https://kenshin.pythonanywhere.com/api/v1/notes/status/${athenaId}`, {
+			fetch(`https://kenshin.pythonanywhere.com/api/v1/notes/status/${athenaId}`, {
 				method: 'PATCH',
 				headers: { 'Content-Type': 'application/json' },
 				body: JSON.stringify({ is_read: newStatus })
 			});
 			
-			// Update the item in our local data
-			item.is_read = newStatus;
+			// Update the item in our local data so the UI can refresh instantly
+			itemToUpdate.is_read = newStatus;
 			
 			// Re-render the list to show the change
-			renderEditorialsForDay(target.closest('.editorial-item').querySelector('.btn-view').dataset.day);
+			renderEditorialsForDay(day);
 		}
 	});
 	
@@ -562,5 +620,5 @@ async function initializeFileExplorer() {
 		if (event.target.classList.contains('modal-backdrop') || event.target.classList.contains('modal-close-btn')) {
 			modal.classList.remove('visible');
 		}
-	});    
+	});
 }
